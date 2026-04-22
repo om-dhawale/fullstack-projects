@@ -62,7 +62,7 @@ export default function Notes() {
   async function handleUpdate(e) {
     e.preventDefault()
     try {
-      const response = await fetch(`http://localhost:5000/api/notes/${editingNote.id}`, {
+      const response = await fetch(`https://notesapp-backend-8w7t.onrender.com/api/notes/${editingNote.id}`, {
         method: 'PUT',
         headers: {
           'content-Type': 'application/json',
@@ -86,7 +86,7 @@ export default function Notes() {
 
   async function handleDelete(id) {
     try {
-      const response = await fetch(`http://localhost:5000/api/notes/${id}`, {
+      const response = await fetch(`https://notesapp-backend-8w7t.onrender.com/api/notes/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       })
