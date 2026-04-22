@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 export default function Notes() {
   const [notes, setNotes] = useState([])
   const [title, setTitle] = useState('')
-  const [content, setContent] = useState('')
+  const [body, setbody] = useState('')
   const [error, setError] = useState('')
   const [editingNote, setEditingNote] = useState(null)
   const navigate = useNavigate()
@@ -32,11 +32,11 @@ export default function Notes() {
     try {
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ title, content })
+        headers: { 'content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ title, body })
       })
       if (response.ok) {
-        setTitle(''); setContent(''); setEditingNote(null); fetchNotes()
+        setTitle(''); setbody(''); setEditingNote(null); fetchNotes()
       }
     } catch (err) { setError(err.message) }
   }
@@ -49,23 +49,23 @@ export default function Notes() {
   }
 
   function handleEdit(note) {
-    setEditingNote(note); setTitle(note.title); setContent(note.body)
+    setEditingNote(note); setTitle(note.title); setbody(note.body)
   }
 
   return (
     <div style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: 'sans-serif', padding: '40px 20px' }}>
       <div style={{ maxWidth: '600px', margin: '0 auto' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', justifybody: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
           <h2 style={{ margin: 0 }}>📝 My Notes</h2>
           <button onClick={() => { localStorage.removeItem('token'); navigate('/login') }} style={{ padding: '8px 16px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #000', background: '#fff' }}>Logout</button>
         </div>
         {error && <p style={{ color: 'red' }}>{error}</p>}
         <div style={{ background: '#fff', padding: '24px', borderRadius: '12px', marginBottom: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
           <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
-          <textarea placeholder="Content" value={content} onChange={e => setContent(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
+          <textarea placeholder="body" value={body} onChange={e => setbody(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
           <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
             <button onClick={handleSubmit} style={{ padding: '10px 20px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>{editingNote ? 'Update' : 'Add Note'}</button>
-            {editingNote && <button onClick={() => { setEditingNote(null); setTitle(''); setContent('') }} style={{ padding: '10px 20px', background: '#fff', border: '1px solid #000', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>}
+            {editingNote && <button onClick={() => { setEditingNote(null); setTitle(''); setbody('') }} style={{ padding: '10px 20px', background: '#fff', border: '1px solid #000', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>}
           </div>
         </div>
         {notes.map(note => (
