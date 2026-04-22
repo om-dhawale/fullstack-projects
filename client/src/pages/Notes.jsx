@@ -32,7 +32,7 @@ export default function Notes() {
     try {
       const response = await fetch(url, {
         method,
-        headers: { 'content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ title, body })
       })
       if (response.ok) {
