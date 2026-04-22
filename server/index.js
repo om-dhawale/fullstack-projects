@@ -25,7 +25,7 @@ app.use(express.json());
 
 // 3. CORS: Allow your local dev environment and your future deployed frontend
 app.use(cors({
-  origin: ["http://localhost:5173", "https://notesapp-backend-8w7t.onrender.com", "https://fullstack-projects-gamma.vercel.app/"], // Add your Render/Vercel frontend URL here later
+  origin: ["http://localhost:5173", "https://notesapp-backend-8w7t.onrender.com", "https://fullstack-projects-gamma.vercel.app"], // Add your Render/Vercel frontend URL here later
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
