@@ -4,165 +4,81 @@ import { useNavigate } from 'react-router-dom'
 export default function Notes() {
   const [notes, setNotes] = useState([])
   const [title, setTitle] = useState('')
-  const [body, setbody] = useState('')
+  const [content, setContent] = useState('')
   const [error, setError] = useState('')
   const [editingNote, setEditingNote] = useState(null)
   const navigate = useNavigate()
-
   const token = localStorage.getItem('token')
+  const API = 'https://notesapp-backend-8w7t.onrender.com'
 
   useEffect(() => {
-    if (!token) {
-      navigate('/login')
-      return
-    }
+    if (!token) { navigate('/login'); return }
     fetchNotes()
   }, [])
 
   async function fetchNotes() {
     try {
-      const response = await fetch('http://localhost:5000/api/notes', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const response = await fetch(`${API}/api/notes`, { headers: { 'Authorization': `Bearer ${token}` } })
       const data = await response.json()
-      if (response.ok) {
-        setNotes(data)
-      } else {
-        setError(data.message)
-      }
-    } catch (err) {
-      setError(err.message)
-    }
+      if (response.ok) setNotes(data)
+      else setError(data.message)
+    } catch (err) { setError(err.message) }
   }
 
-  async function handleCreate(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
+    const url = editingNote ? `${API}/api/notes/${editingNote.id}` : `${API}/api/notes`
+    const method = editingNote ? 'PUT' : 'POST'
     try {
-      const response = await fetch('http://localhost:5000/api/notes', {
-        method: 'POST',
-        headers: {
-          'content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ title, body: body })
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ title, content })
       })
-      const data = await response.json()
       if (response.ok) {
-        setTitle('')
-        setbody('')
-        fetchNotes()
-      } else {
-        setError(data.message)
+        setTitle(''); setContent(''); setEditingNote(null); fetchNotes()
       }
-    } catch (err) {
-      setError(err.message)
-    }
-  }
-
-  async function handleUpdate(e) {
-    e.preventDefault()
-    try {
-      const response = await fetch(`https://notesapp-backend-8w7t.onrender.com/api/notes/${editingNote.id}`, {
-        method: 'PUT',
-        headers: {
-          'content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ title, body: body })
-      })
-      const data = await response.json()
-      if (response.ok) {
-        setEditingNote(null)
-        setTitle('')
-        setbody('')
-        fetchNotes()
-      } else {
-        setError(data.message)
-      }
-    } catch (err) {
-      setError(err.message)
-    }
+    } catch (err) { setError(err.message) }
   }
 
   async function handleDelete(id) {
     try {
-      const response = await fetch(`https://notesapp-backend-8w7t.onrender.com/api/notes/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      if (response.ok) {
-        fetchNotes()
-      }
-    } catch (err) {
-      setError(err.message)
-    }
+      await fetch(`${API}/api/notes/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } })
+      fetchNotes()
+    } catch (err) { setError(err.message) }
   }
 
   function handleEdit(note) {
-    setEditingNote(note)
-    setTitle(note.title)
-    setbody(note.body)
-  }
-
-  function handleCancelEdit() {
-    setEditingNote(null)
-    setTitle('')
-    setbody('')
-  }
-
-  function handleLogout() {
-    localStorage.removeItem('token')
-    navigate('/login')
+    setEditingNote(note); setTitle(note.title); setContent(note.body)
   }
 
   return (
-    <div style={{ maxWidth: '600px', margin: '40px auto', fontFamily: 'sans-serif', padding: '0 20px' }}>
-      <div style={{ display: 'flex', justifybody: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ margin: 0 }}>My Notes</h2>
-        <button onClick={handleLogout} style={{ padding: '8px 16px', cursor: 'pointer' }}>Logout</button>
-      </div>
-
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-
-      <form onSubmit={editingNote ? handleUpdate : handleCreate} style={{ marginTop: '24px' }}>
-        <input
-          type="text"
-          placeholder="Title"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          style={{ width: '100%', padding: '8px', marginBottom: '8px', boxSizing: 'border-box' }}
-        />
-        <textarea
-          placeholder="body"
-          value={body}
-          onChange={e => setbody(e.target.value)}
-          rows={4}
-          style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}
-        />
-        <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
-          <button type="submit" style={{ padding: '8px 16px', cursor: 'pointer' }}>
-            {editingNote ? 'Update Note' : 'Add Note'}
-          </button>
-          {editingNote && (
-            <button type="button" onClick={handleCancelEdit} style={{ padding: '8px 16px', cursor: 'pointer' }}>
-              Cancel
-            </button>
-          )}
+    <div style={{ minHeight: '100vh', background: '#f5f5f5', fontFamily: 'sans-serif', padding: '40px 20px' }}>
+      <div style={{ maxWidth: '600px', margin: '0 auto' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <h2 style={{ margin: 0 }}>📝 My Notes</h2>
+          <button onClick={() => { localStorage.removeItem('token'); navigate('/login') }} style={{ padding: '8px 16px', cursor: 'pointer', borderRadius: '6px', border: '1px solid #000', background: '#fff' }}>Logout</button>
         </div>
-      </form>
-
-      <hr style={{ margin: '24px 0' }} />
-
-      {notes.map(note => (
-        <div key={note.id} style={{ border: '1px solid #ddd', borderRadius: '8px', padding: '16px', marginBottom: '12px' }}>
-          <h3 style={{ margin: '0 0 8px 0' }}>{note.title}</h3>
-          <p style={{ margin: '0 0 12px 0' }}>{note.body}</p>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button onClick={() => handleEdit(note)} style={{ padding: '6px 12px', cursor: 'pointer' }}>Edit</button>
-            <button onClick={() => handleDelete(note.id)} style={{ padding: '6px 12px', cursor: 'pointer' }}>Delete</button>
+        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div style={{ background: '#fff', padding: '24px', borderRadius: '12px', marginBottom: '24px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+          <input type="text" placeholder="Title" value={title} onChange={e => setTitle(e.target.value)} style={{ width: '100%', padding: '10px', marginBottom: '12px', borderRadius: '6px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
+          <textarea placeholder="Content" value={content} onChange={e => setContent(e.target.value)} rows={4} style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #ddd', boxSizing: 'border-box' }} />
+          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <button onClick={handleSubmit} style={{ padding: '10px 20px', background: '#000', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer' }}>{editingNote ? 'Update' : 'Add Note'}</button>
+            {editingNote && <button onClick={() => { setEditingNote(null); setTitle(''); setContent('') }} style={{ padding: '10px 20px', background: '#fff', border: '1px solid #000', borderRadius: '6px', cursor: 'pointer' }}>Cancel</button>}
           </div>
         </div>
-      ))}
+        {notes.map(note => (
+          <div key={note.id} style={{ background: '#fff', padding: '20px', borderRadius: '12px', marginBottom: '12px', boxShadow: '0 2px 12px rgba(0,0,0,0.08)' }}>
+            <h3 style={{ margin: '0 0 8px 0' }}>{note.title}</h3>
+            <p style={{ margin: '0 0 16px 0', color: '#444' }}>{note.body}</p>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => handleEdit(note)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid #000', background: '#fff', cursor: 'pointer' }}>Edit</button>
+              <button onClick={() => handleDelete(note.id)} style={{ padding: '6px 14px', borderRadius: '6px', border: '1px solid red', color: 'red', background: '#fff', cursor: 'pointer' }}>Delete</button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
