@@ -20,7 +20,7 @@
         if(!title || !body) {
             return res.status(400).json({message: "enter both title and body"});
         }
-        const user_id = req.user.user_id;
+        const user_id = req.user.user_id || req.user.id;
         try {
             const result = await pool.query('INSERT INTO notes(title, body, user_id) VALUES($1, $2, $3) RETURNING *', [title, body, user_id]);
         res.status(201).json(result.rows[0]);
