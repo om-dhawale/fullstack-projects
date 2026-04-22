@@ -9,6 +9,7 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+app.use(express.json());
 
 app.use((req, res, next) => {
   res.setHeader("Content-Security-Policy", "default-src 'self' https://notesapp-backend-8w7t.onrender.com; img-src 'self' data:;");
@@ -21,7 +22,7 @@ app.get('/favicon.ico', (req, res) => {
 });
 
 // 2. MIDDLEWARE
-app.use(express.json());
+
 
 // 3. CORS: Allow your local dev environment and your future deployed frontend
 app.use(cors({

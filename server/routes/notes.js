@@ -16,10 +16,13 @@
 
 
     router.post('/', async (req, res) => {
+        console.log("Incoming Request Body:", req.body);
         const {title, body} = req.body;
         if(!title || !body) {
-            return res.status(400).json({message: "enter both title and body"});
-        }
+        return res.status(400).json({
+            message: "Missing fields", 
+            received: { title: !!title, body: !!body } // This tells us which one is empty
+        });
         const user_id = req.user.user_id || req.user.id;
         try {
             const result = await pool.query('INSERT INTO notes(title, body, user_id) VALUES($1, $2, $3) RETURNING *', [title, body, user_id]);
