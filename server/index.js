@@ -10,8 +10,15 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// 1. SILENCE FAVICON ERROR: Tells the browser there is no icon here
-app.get('/favicon.ico', (req, res) => res.status(204).end());
+app.use((req, res, next) => {
+  res.setHeader("Content-Security-Policy", "default-src 'self' https://notesapp-backend-8w7t.onrender.com; img-src 'self' data:;");
+  next();
+});
+
+// 2. The manual favicon handler
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).attr('Content-Type', 'image/x-icon').end();
+});
 
 // 2. MIDDLEWARE
 app.use(express.json());
